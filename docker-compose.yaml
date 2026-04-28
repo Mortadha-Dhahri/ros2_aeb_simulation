@@ -1,0 +1,18 @@
+services:
+  aeb:
+    build: .
+    container_name: aeb_sim
+    environment:
+      - ROS_DOMAIN_ID=42
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - CYCLONEDDS_URI=file:///cyclone_config.xml
+    volumes:
+      - ./aeb_ws:/aeb_ws
+      - ./cyclone_config.xml:/cyclone_config.xml:ro
+    stdin_open: true
+    tty: true
+    command: bash
+ 
+networks:
+  default:
+    driver: bridge
