@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y \
     ros-jazzy-rclpy \
     ros-jazzy-std-msgs \
     ros-jazzy-sensor-msgs \
+    ros-jazzy-rmw-cyclonedds-cpp \
     python3-colcon-common-extensions \
     && rm -rf /var/lib/apt/lists/*
  
