@@ -1,0 +1,13 @@
+gitignore# ROS2 build artifacts
+aeb_ws/build/
+aeb_ws/install/
+aeb_ws/log/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Editor
+.vscode/
+*.swp
