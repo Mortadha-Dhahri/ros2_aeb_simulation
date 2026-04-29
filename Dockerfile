@@ -1,4 +1,4 @@
-FROM osrf/ros:jazzy-ros-core
+FROM ros:jazzy-ros-core
  
 RUN apt-get update && apt-get install -y \
     ros-jazzy-rclpy \
