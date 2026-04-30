@@ -37,5 +37,18 @@ def generate_launch_description():
             parameters=[config],
             output='screen',
         ),
-
+        Node(
+            package='aeb_simulation',
+            executable='logger_node',
+            name='logger_node',
+            parameters=[config],
+            output='screen',
+        ),
+        Node(
+            package='aeb_simulation',
+            executable='brake_actuator_node',
+            name='brake_actuator_node',
+            parameters=[config],
+            output='screen',
+        ),
     ])
