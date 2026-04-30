@@ -11,16 +11,17 @@ class LoggerNode(Node):
         self._session_start = datetime.now()
         self._last_brake_cmd = None
         self._event_count = 0
-
-        self.create_subscription(String, '/brake_cmd',          self._on_brake_cmd, 10)
-        self.create_subscription(Float32, '/ttc',               self._on_ttc, 10)
-        self.create_subscription(Float32, '/vehicle/speed',     self._on_speed, 10)
-        self.create_subscription(Float32, '/brake/pressure',    self._on_pressure, 10)
-        self.create_subscription(Bool, '/simulation/shutdown',  self._on_shutdown, 10)
+        self._active = True
 
         self._last_speed = None
         self._last_ttc = None
         self._last_pressure = None
+
+        self.create_subscription(String,  '/brake_cmd',           self._on_brake_cmd, 10)
+        self.create_subscription(Float32, '/ttc',                 self._on_ttc,       10)
+        self.create_subscription(Float32, '/vehicle/speed',       self._on_speed,     10)
+        self.create_subscription(Float32, '/brake/pressure',      self._on_pressure,  10)
+        self.create_subscription(Bool,    '/simulation/shutdown', self._on_shutdown,  10)
 
         self.get_logger().info(
             f'Logger node ready — session: '
@@ -46,7 +47,6 @@ class LoggerNode(Node):
 
     def _on_ttc(self, msg):
         ttc = msg.data
-        # log TTC milestones
         if self._last_ttc is None:
             self._last_ttc = ttc
             return
@@ -60,7 +60,6 @@ class LoggerNode(Node):
         if self._last_speed is None:
             self._last_speed = speed
             return
-        # log speed milestones
         for threshold in [10.0, 5.0, 1.0, 0.0]:
             if self._last_speed > threshold >= speed:
                 self._log_event(f'Speed crossed {threshold}m/s → {speed:.2f}m/s')
@@ -78,15 +77,27 @@ class LoggerNode(Node):
         self._last_pressure = pressure
 
     def _on_shutdown(self, msg):
-        if msg.data:
+        if msg.data and self._active:
             self._log_event(
                 f'SIMULATION COMPLETE — '
                 f'duration: {self._elapsed():.1f}s | '
                 f'events logged: {self._event_count}',
                 'warn')
+            self._active = False
 
 
 def main(args=None):
     rclpy.init(args=args)
-    rclpy.spin(LoggerNode())
-    rclpy.shutdown()
+    node = LoggerNode()
+    try:
+        while rclpy.ok() and node._active:
+            rclpy.spin_once(node, timeout_sec=0.1)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
