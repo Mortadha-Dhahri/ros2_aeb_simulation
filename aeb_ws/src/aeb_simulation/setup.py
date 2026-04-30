@@ -28,6 +28,9 @@ setup(
             'lidar_sim_node     = aeb_simulation.lidar_sim_node:main',
             'vehicle_state_node = aeb_simulation.vehicle_state_node:main',
             'aeb_decision_node  = aeb_simulation.aeb_decision_node:main',
+            'logger_node = aeb_simulation.logger_node:main',
+            'brake_actuator_node=aeb_simulation.brake_actuator_node:main',
+            'shutdown_node = aeb_simulation.shutdown_node:main'
         ],
     },
 )
