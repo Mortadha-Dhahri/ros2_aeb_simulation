@@ -67,5 +67,8 @@ class BrakeActuatorNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    rclpy.spin(BrakeActuatorNode())
+    node = BrakeActuatorNode()
+    while rclpy.ok() and node._active:
+        rclpy.spin_once(node, timeout_sec=0.1)
+    node.destroy_node()
     rclpy.shutdown()

@@ -1,8 +1,7 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import RegisterEventHandler
+from launch.actions import RegisterEventHandler, TimerAction, EmitEvent
 from launch.event_handlers import OnProcessExit
-from launch.actions import EmitEvent
 from launch.events import Shutdown
 from ament_index_python.packages import get_package_share_directory
 import os
@@ -59,11 +58,18 @@ def generate_launch_description():
         output='screen',
     )
 
-    # when shutdown_node exits (sys.exit(0)) — tear down everything
+    # when shutdown_node exits cleanly, wait 1s then shut everything down
+    # the 1s gives all other nodes time to receive /simulation/shutdown
+    # process it, and exit naturally via their spin_once loops
     shutdown_handler = RegisterEventHandler(
         OnProcessExit(
             target_action=shutdown_node,
-            on_exit=[EmitEvent(event=Shutdown())]
+            on_exit=[
+                TimerAction(
+                    period=1.0,
+                    actions=[EmitEvent(event=Shutdown())]
+                )
+            ]
         )
     )
 
